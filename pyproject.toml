@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "otus-project"
+version = "0.1.0"
+description = "Система учёта работ для сервисного центра"
+authors = ["Петр Черкесов <petr.cherkesov@playrix.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.4"
+
+
+[tool.poetry.group.dev.dependencies]
+django-debug-toolbar = "^4.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

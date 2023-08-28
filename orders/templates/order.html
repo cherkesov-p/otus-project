@@ -1,0 +1,300 @@
+
+{% extends "layouts/main_app.html" %}
+{% load static %}
+{% block jslibs %}
+        <script type="text/javascript" src="{% static 'js/single.js' %}"></script>
+{% endblock %}
+{% block content %}
+                {% if order.finish_date == none %}
+                <span class="glyphicon glyphicon-chevron-left"></span> <a href='{% url 'incomplete' %}'>Вернуться назад</a>
+                {% else %}
+                <span class="glyphicon glyphicon-chevron-left"></span> <a href='{% url 'complete' %}'>Вернуться назад</a>
+                {% endif %}
+                <h3>
+                {% if order.finish_date == none %}
+                <span class="glyphicon glyphicon-unchecked"></span>
+                {% else %}
+                <span class="glyphicon glyphicon-check"></span>
+                {% endif %}
+                Работа #<span id="work-id">{{ order.id }}</span> от <span id="work-date">{{ order.start_date|date:'d.m.Y' }}</span> - {{ order.finish_date|date:'d.m.Y'|default:'00.00.0000' }}</h3>
+                <!--<div class="container">-->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <dl>
+                            {% if order.client.id == 1 %}
+                            <dt>Заказчик:</dt>
+                            <dd>{{ order.client_name }}
+                                <a title="Поиск по клиенту" data-toggle="tooltip"
+                                href=''>
+                                <span class="glyphicon glyphicon-search"></span>
+                                </a>                              
+                            </dd>
+                            <dt>Телефон:</dt>
+                            <dd><span id="client_tel">{{ order.client_telephone }}</span>
+                                <a title="Поиск по номеру телефона" data-toggle="tooltip"
+                                  href='/index.php?r=search/view&search={{ order.client_telephone }}'>
+                                  <span class="glyphicon glyphicon-search"></span>
+                                </a>
+                            </dd>
+                            {% else %}
+                            <dt>Заказчик:</dt>
+                            <dd>{{ order.client.name }}
+                                <a title="Поиск по клиенту" data-toggle="tooltip"
+                                href=''>
+                                <span class="glyphicon glyphicon-search"></span>
+                                </a>                              
+                            </dd>
+                            <dt>Телефон:</dt>
+                            <dd><span id="client_tel">{{ order.client.telephone }}</span>
+                                <a title="Поиск по номеру телефона" data-toggle="tooltip"
+                                    href='/index.php?r=search/view&search={{ order.client.telephone }}'>
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </a>
+                            </dd>
+                            {% endif %}
+                            </dl>
+                        </div>
+                        <div class="col-md-3">
+                            <dl>
+                                <dt>Техника:</dt>
+                                <dd>{{ order.device.type }} {{ order.device.brand }} {{ order.device.model }}
+                                    <a title="Поиск по модели" data-toggle="tooltip"
+                                      href='/index.php?r=search/view&search={{ order.brand }} {{ order.model }}'>
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </a>
+                                </dd>
+                                <dt>Серийный номер:</dt>
+                                <dd>
+                                    {{ order.serial }} 
+                                    <a title="Поиск по серийному номеру" data-toggle="tooltip"
+                                      href='/index.php?r=search/view&search={{ order.serial }}'>
+                                      <span class="glyphicon glyphicon-search"></span>
+                                    </a>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-3">
+                            <dl>
+                                <dt>Принял:</dt>
+                                <dd>{{  order.user.name }}</dd>
+                                <dt>Работает:</dt>
+                                <dd>
+                                <div class="form-inline">
+                                    {% if order.worker %}
+                                    <div id="worker-name">
+                                        <span id="work-worker" data-worker-id="{{ order.worker.id }}">{{ order.worker.name }}</span> <span class="glyphicon glyphicon-remove onLink onWorkerRemove"></span>
+                                    </div>
+                                    {% else %}
+                                    <div id="worker-select">
+                                        <select class="form-control input-sm" id="work-worker-select" name="work-worker-select">
+                                        {% for worker in workers %}
+                                            <option value="{{ worker.id }}">{{ worker.name }}</option>
+                                        {% endfor %}
+                                        </select> <span class="glyphicon glyphicon-ok onLink onWorkerSave"></span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <dl class="dl-horizontal">
+                                <dt>Комплектация: </dt>
+                                <dd>{{ order.equipment }}</dd>
+                                <dt>Причина обращения: </dt>
+                                <dd>{{ order.reason }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                <!--</div>-->
+<table class="table table-condensed">
+    <tr>
+        <th>&nbsp;</th>
+        <th>Дата</th>
+        <th>Работа</th>
+        <th>Сумма</th>
+        <th>Упр.</th>
+    </tr>
+{% for work in works %}
+    <tr>
+            <td>
+                <span style="color: #{{ work.user.color }}" class="glyphicon glyphicon glyphicon-user"></span>
+            {{ work.user.name }}</td>
+            <td>{{ work.date|date:"d.m.Y" }}</td>
+            <td class="work" align="left">{{ work.work }}
+            {% if work.hardware is iterable %}
+                <i>
+            {% for hard in work.hardware %}
+                <br />{{ hard.edit_hard }} - {{ hard.edit_hardprice }}
+            {% endfor %}
+                </i>
+            {% else %}
+                <br />
+                {{ work.hard }}
+            {% endif %}
+            </td>
+            <td align="center">{{ work.work_price }}
+            {% if work.hard_price != 0 %}
+                <br />{{ work.hard_price }}
+            {% endif %}
+            </td>
+            <td  class="work" align="center">
+            {% if order.finish_date == none %}
+            <a href="#" data-work-id="{{ work.id }}" class="onWorkEdit"><span class="glyphicon glyphicon-pencil"></span></a>
+            &nbsp;
+            <a href="#" data-work-id="{{ work.id }}" class="onWorkDel"><span style="color: red;" class="glyphicon glyphicon-remove"></span></a>
+            {% endif %}
+            </td>
+    </tr>
+{% endfor %}
+</table>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-6">
+            <h4 class="pull-right worktotal">Итого: ({{ total.work }} + {{ total.hard }}) = {{ total.summ }} руб.</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="btn-group statusbar" data-toggle="buttons" id="status-icon">
+            {% for status in statuses %}
+                <label class="btn btn-default{% if status in order.status.all %} active{% endif %}" data-id="{{ order.id }}" data-value="{{ status.id }}">
+                    <input type="checkbox">
+                    <img src='{% static 'img/icon/'|add:status.icon %}' 
+                    data-toggle="tooltip" data-placement="top" data-original-title='{{ status.title|default:"Нет описания" }}' />
+                </label>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+        {% if order.finish_date == none %}
+            <button type="button" class="btn btn-primary onWorkAdd" data-curr-date="{{ current_date|date:"Y-m-d" }}">
+            <i class="glyphicon glyphicon-plus"></i> Добавить запись</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                <i class="glyphicon glyphicon-envelope"></i> СМС <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a data-toggle="modal" data-target="#sendSMS_modal" href="#">Отправить </a>
+                    </li>
+                    <li><a href="" target="_blank">История</a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <i class="glyphicon glyphicon-print"></i> Печать <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="{% url 'order_print' order.id %}" target="_blank">Печать бланка</a></li>
+                    <li><a href="#" id="printCheck_submit">Печать чека</a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-success onWorkComplete"  href="{% url 'order_complete' order.id %}">
+                    <i class="glyphicon glyphicon-ok"></i> Завершить работу</a>
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>&nbsp;
+                        <span class="sr-only">Меню с переключением</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="" class="onWorkCompleteWOCheck">Завершить без чека</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a class="btn btn-default btn-danger onWorkUncomplete" href="{% url 'order_incomplete' order.id %}"><i class="glyphicon glyphicon-repeat"></i> Вернуть в работу</a>
+                <a class="btn btn-default btn-primary" href="/index.php?r=add/view&id={{ order.id }}"><i class="glyphicon glyphicon-share"></i> Создать копию</a>
+                {% endif %}
+            </div>      
+        </div>
+        <hr />
+        <div class="row">
+        <div class="col-md-12" id="editFrame">
+            <form role="form" id="editForm" action="{% url 'work_create' %}" method="post">
+                <div class="container">
+                    {% csrf_token %}
+                    <input type="hidden" id="order_id" name="order_id" value="{{ order.id }}"></input>
+                    <input type="hidden" id="work_id" name="work_id" value=""></input>
+                    <input type="hidden" id="edit_parts" name="edit_parts" value=""></input>
+                    <input type="hidden" id="edit_parts_price" name="edit_parts_price" value=""></input>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-2 col-md-offset-2">
+                                <input type="date" class="form-control" id="edit_date" name="edit_date" value="">
+                            </div>  
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2">
+                                <textarea id="edit_text" name="edit_text" class="form-control" rows="3"></textarea>
+                            </div>  
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-2 col-md-offset-2">
+                                <input type="number" id="edit_price" name="edit_price" value="" placeholder="Цена" class="form-control"></input>
+                            </div>
+                            <div class="col-md-2 col-md-offset-4">
+                                <button type="button" class="btn btn-info btn-block onPartsAdd"><i class="glyphicon glyphicon-plus"></i> Комплектующие</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="parts_row" style="display: none;">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-5 col-md-offset-2">
+                                <input type="text" value="" name="hard" placeholder="Наименование" class="form-control"></input>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" value="" name="hard_price" placeholder="Цена" class="form-control"></input>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-link btn-block" onclick="$(this).parent().parent().parent().remove();">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="form-group" id="parts">
+                    </div>
+                    <div class="form-group">
+                        <div class="row">       
+                            <div class="col-md-2 col-md-offset-6">
+                                <select class="form-control" id="edit_worker" name="edit_worker">
+                                {% for worker in workers %}
+                                    <option value="{{ worker.id }}">{{ worker.name }}</option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-block"><i class="glyphicon glyphicon-ok"></i> Сохранить запись</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>            
+        </div>
+    </div>
+    <div class="modal fade" id="sendSMS_modal" tabindex="-1" role="dialog" aria-labelledby="sendSMS_label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="sendSMS_label">Отправить SMS клиенту</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" id="sendSMS_tel" class="form-control" placeholder="Номер телефона" value="{{ order.client_tel }}"></input>
+                    </div>              
+                    <textarea id="sendSMS_text" class="form-control" rows="4">Ваш {{ order.model.type|lower }} готов к выдаче.
+Подробности на сайте: сц-онлайн.рф</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="sendSMS_submit" autocomplete="off" class="btn btn-primary" data-loading-text="Отправка...">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

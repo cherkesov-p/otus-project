@@ -1,0 +1,36 @@
+<tbody>
+    {% if clients %}
+        <tr>
+            <td><a href="#" class="on-addClient"><span class="glyphicon glyphicon-plus"></span> Добавить нового клиента...</a></td>
+            <td></td>
+        </tr>
+        {% for client in clients %}
+        <tr>
+            <td><a href="#" class="on-client" data-client-id="{{ client.id }}" data-client-tel="{{ client.telephone }}">{{ client.name }}</a></td>
+            <td><span class="on-client glyphicon glyphicon-pencil pull-right" data-client-id="{{ client.id }}" data-client-name="{{ client.name }}" data-client-tel="{{ client.telephone }}"></span></td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+
+    {% if devices %}
+        <tr>
+            <td><a href="#" class="on-adddevice"><span class="glyphicon glyphicon-plus"></span> Добавить новое устройство...</a></td>
+            <td></td>
+        </tr>									
+    {% for device in devices %}
+        <tr>
+            <td><a href="#" class="on-device" data-device-id="{{ device.id }}">{{ device.type }} {{ device.brand }} {{ device.model }}</a></td>
+            <td><span class="on-device glyphicon glyphicon-pencil pull-right" data-device-id="{{ device.id }}" data-device-type="{{ device.type }}" data-device-brand="{{ device.brand }}" data-device-name="{{ device.model }}"></span></td>
+        </tr>
+    {% endfor %}
+    {% endif %}
+
+    {% if serials %}
+    {% for serial in serials %}
+        <tr>
+            <td><a href="#" class="on-serial">{{ serial.serial }}</a></td>
+            <td><span class="on-serial glyphicon glyphicon-new-window pull-right" data-serial="{{ serial.serial }}"></span></td>
+        </tr>
+    {% endfor %}
+    {% endif %}									
+    </tbody>

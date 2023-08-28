@@ -1,0 +1,62 @@
+{% extends "layouts/main_app.html" %}
+{% load static %}
+{% block jslibs %}
+        <script type="text/javascript" src="{% static 'js/many.js' %}"></script>
+{% endblock %}
+{% block content %}
+{% comment %} {% if urls.today %}
+    {% set searchOption = 'year' %}
+{% else %}
+    {% set searchOption = 'orderer' %}
+{% endif %}
+{% include 'searchbar' with {'searchOption': searchOption, 'header': header } %} {% endcomment %}
+{{ search }}
+{% include 'searchbar.html' with searchOption=search.options header=header %}
+<br />
+<table class="table table-bordered table-condensed table-hover" id="table-orders">
+<thead>
+    <tr>
+        <th>&nbsp;</th>
+        <th class="hide">##</th>
+        <th>Дата</th>
+        <th>Техника</th>
+        <th>Заказчик</th>
+        <th>Серийный номер</th>
+        <th>Статус</th>
+    </tr>
+</thead>
+<tbody>
+{% for order in orders %}
+    {% if order.finish_date == none %}
+    <tr class="active">
+    {% else %}
+    <tr>
+    {% endif %}
+            <td width="2%">
+                <span style="color: #{{ order.worker.color }}" class="glyphicon glyphicon glyphicon-user" 
+                data-toggle="tooltip" data-placement="top" data-original-title="{{ order.worker.name }}"></span>
+            </td>
+            <td class="hide">{{ order.id }}</td>
+            <td align="center" title="id: {{ order.id }}">{{ order.start_date|date:'d.m.Y' }}</td>
+            <td align="left">
+                <a href="{% url 'order_view' order.id %}">{{ order.device.type }} {{ order.device.brand }} {{ order.device.model }}</a>
+            </td>
+            <td align="center">
+            {% if order.client.id == 1 %}
+                {{ order.client_name }}
+            {% else %}
+                {{ order.client.name }}
+            {% endif %}
+            </td>
+            <td align="center">{{ order.serial }}</td>
+            <td align="center">
+                {% for status in order.status.all %}
+                <img src="{% static 'img/icon/'|add:status.icon %}" alt="{{ static.title }}"
+                data-toggle="tooltip" data-placement="top" data-original-title='{{ status.title|default:"Нет описания" }}'>
+                {% endfor %}
+            </td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

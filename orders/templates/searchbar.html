@@ -1,0 +1,35 @@
+<div class="row">
+	<div class="col-md-3">
+	{% comment %} {% if searchOption == 'year' %}
+		<div class="form-group btn-group">
+			<button type="button" class="btn btn-default">
+				<a href="{{ url(urls.left.url) }}"><span class="glyphicon glyphicon-chevron-left"></span></a>
+			</button>
+			<button type="button" class="btn btn-default">{{ trans_choice('main.months', urls.today.month)|upper }} {{ urls.today.year }}</button>
+			<button type="button" class="btn btn-default">
+				<a href="{{ url(urls.right.url) }}"><span class="glyphicon glyphicon-chevron-right"></span></a>
+			</button>
+		</div>
+	{% endif %} {% endcomment %}
+    {{ searchOption }}
+	{% if searchOption == 'worker' %}
+		<div class="form-group">	
+			<form id="workerSort" method="post" action="">
+				<select class="form-control" id="worker-sort">
+				{% for worker in workers %}
+					<option value="{{ worker.id }}"{% if header.sort == worker.id %} selected{% endif %}>{{ worker.name }}</option>
+				{% endfor %}
+				</select>
+			</form>
+		</div>
+	{% endif %}
+	</div>
+	<div class="col-md-9">
+		<div class="input-group">
+			<input type="search" id="search" value="" class="form-control" placeholder="Поиск..." autocomplete="off">
+			<div class="input-group-btn">
+				<button type="button" id="search-clear" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-remove form-control-feedback"></span></button>
+			</div>
+		</div>
+	</div>
+</div>

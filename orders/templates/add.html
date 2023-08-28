@@ -1,0 +1,152 @@
+{% extends "layouts/main_app.html" %}
+{% load static %}
+{% block jslibs %}
+	<script type="text/javascript" src="{% static 'js/add.js' %}"></script>
+	<script type="text/javascript" src="{% static 'lib/bootstrap3.typeahead.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+			<div class="row">
+				<div class="col-md-6">
+					<form action="{% url 'order_create' %}" method="post" id="on-addWork">
+						{% csrf_token %}
+						<input type="hidden" id="client_id" name="client_id" value="{{ order.client.id|default:1 }}" />
+						<input type="hidden" id="device_id" name="device_id" value="{{ order.device.id }}" />
+						<div class="row">
+							<div class="col-md-4">
+								<input type="date" class="form-control" id="start_date" name="start_date" value="{{ current_date|date:"Y-m-d" }}">
+							</div>
+						</div>
+						<br>
+						<fieldset>
+							<ul class="nav nav-tabs">
+								<li class="active">
+									<a href="#human" id="noFields" data-toggle="tab">Частное лицо</a>
+								 </li>
+								<li>
+									<a href="#org" id="clientFields" data-toggle="tab">Юридическое лицо</a>
+								 </li>
+							</ul><br>
+							<!-- Tab panes -->
+							<div class="tab-content">
+								<div class="tab-pane active" id="human">
+									<input type="text" class="form-control" placeholder="ФИО" id="client_name" name="client_name"  value="{{ order.client_name }}" autocomplete="off" />
+									<br>
+									<input type="text" class="form-control" placeholder="Телефон" id="client_telephone" name="client_telephone" value="{{ order.client_telephone }}" autocomplete="off" />
+								</div>
+								<div class="tab-pane" id="org">
+									<input type="text" class="form-control" placeholder="ФИО" id="org_name" value="{{ order.client.name }}" disabled />
+									<br>
+									<input type="text" class="form-control" placeholder="Телефон" id="org_telephone" value="{{ data.client.telephone }}" disabled />
+								</div>
+							</div>
+						</fieldset>
+						<hr />
+						<fieldset>
+							<div id="deviceFields">
+								<input type="text" class="form-control" placeholder="Наименование" id="device_name"  value="{{ order.device.model }}" readonly />
+							</div>
+							<br>
+							<div id="serialFields">
+								<input type="text" class="form-control" placeholder="Серийный номер" id="serial" name="serial" value="{{ order.serial }}" autocomplete="off" />
+							</div>
+						</fieldset>
+						<hr />
+						<fieldset id="affixFields">
+							<textarea class="input-block-level form-control textarea" placeholder="Комплектность" name="equipment" rows="3">{{ order.equipment }}</textarea><br>
+							<textarea class="input-block-level form-control textarea" placeholder="Заявленный дефект" name="reason" rows="3">{{ order.reason }}</textarea>
+						</fieldset>
+						<hr />
+						<div class="row">
+							<div class="col-md-5">
+								<select class="form-control" id="worker_id" name="worker_id">
+								{% for worker in workers %}
+									<option value="{{ worker.id }}">{{ worker.name }}</option>
+								{% endfor %}
+								</select>
+							</div>
+							<div class="col-md-2">
+								<div class="material-switch" data-toggle="tooltip" data-placement="top" data-original-title="Печать бланка">
+									<input id="print" name="print" type="checkbox" checked />
+									<label for="print" class="label-primary"></label>
+								</div>
+							</div>		
+							<div class="col-md-5">
+								<p class="pull-right">
+									<button type="reset" value="Reset" class="btn btn-default">Сбросить</button>
+									<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-saved"></span> Сохранить </button>
+								</p>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<span id="on-ListName">Списки</span>
+								<span class="pull-right">
+								<input type="text" id="ListSearch" style="border: 0px; border-bottom: 1px solid black; background: #F5F5F5;  outline: none;"></input> <span class="glyphicon glyphicon-search on-searchClear"></span>
+								</span>
+							</h4>
+						</div>
+						<div id="ListPanel" class="panel-collapse collapse in">
+							<div class="panel-body" style="overflow-y: scroll; height: 500px !important; padding: 0px;">
+								<table class="table table-stripped" id="List">
+									<tr>
+										<td>Нет данных</td>
+										<td></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	<div class="modal fade" id="editClient_modal" tabindex="-1" role="dialog" aria-labelledby="editClient_label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="editClient_label">Добавить/Изменить клиента</h4>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="editClient_id"></input>
+					<div class="form-group">
+						<input type="text" id="editClient_name" class="form-control"></input>
+					</div>
+					<div class="form-group">
+						<input type="text" id="editClient_tel" class="form-control"></input>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="editClient_submit" autocomplete="off" class="btn btn-primary">Отправить</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="editDevice_modal" tabindex="-1" role="dialog" aria-labelledby="editDevice_label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="editClient_label">Добавить/Изменить устройство</h4>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="editDevice_id"></input>
+					<div class="form-group">
+						<input type="text" id="editDevice_type" class="form-control" data-provide="typeahead" autocomplete="off" placeholder="Тип техники"></input>
+					</div>
+					<div class="form-group">
+						<input type="text" id="editDevice_brand" class="form-control" data-provide="typeahead" autocomplete="off" placeholder="Производитель"></input>
+					</div>
+					<div class="form-group">
+						<input type="text" id="editDevice_name" class="form-control" data-provide="typeahead" autocomplete="off" placeholder="Наименование"></input>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="editDevice_submit" autocomplete="off" class="btn btn-primary">Отправить</button>
+				</div>
+			</div>
+		</div>
+	</div>	
+{% endblock %}

@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-md-9">
+        <div class="btn-group">
+            {% comment %} <button type="button" class="btn btn-default"><a href="/index.php?r=stat/month&date={{ "now"|date("m/Y") }}">За месяц</a></button> {% endcomment %}
+            <button type="button" class="btn btn-default"><a href="{% url 'incomplete' %}">Незавершённые</a></button>
+            <button type="button" class="btn btn-default"><a href="{% url 'complete' %}">Завершённые</a></button>
+            <button type="button" class="btn btn-default"><a href="{% url 'all' %}">Всё</a></button>
+            <button type="button" class="btn btn-default"><a href="/sms">СМС</a></button>
+            <button type="button" class="btn btn-default"><a href="{% url 'order_create_from' %}">Добавить</a></button>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <form role="search" action="index.php" method="get" id="globalSearch">
+            <div class="input-group">
+                <input type="hidden" name="r" value="search/view">
+                <input type="search" class="form-control" name="search" placeholder="Глобальный поиск" value="{{ header.search|default:'' }}" autocomplete="off">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>

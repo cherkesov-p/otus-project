@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Language" content="ru" />
+    <meta name="title" content="" />
+    <meta name="author" content="BlOr" />
+    <title>СЦ &laquo;OnLine&raquo;: {{ title }}</title>
+    
+    {% load static %}
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <!-- Bootstrap -->
+    <link href="{% static 'lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/jgrowl/jquery.jgrowl.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div id="jGrowl-container" class="jGrowl bottom-right"></div>
+    <div class="container">
+{% include 'layouts/header.html' %}
+{% include 'layouts/menu.html' %}
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+{% block content %}
+{% endblock %}
+            </div>
+        </div>
+        <br />
+{% include 'layouts/footer.html' %}
+    </div>
+    <div class="modal fade" id="sendMail_modal" tabindex="-1" role="dialog" aria-labelledby="sendMail_label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="sendMail_label">Отправить сообщение</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea id="sendMail_text" class="form-control" rows="7"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="sendMail_submit" autocomplete="off" class="btn btn-primary">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{# include 'debug.html' #}
+    <script src="{% static 'lib/jquery-2.1.1.min.js' %}"></script>
+    <script src="{% static 'lib/jquery.searchable-1.0.0.js' %}"></script>
+    <script src="{% static 'lib/jquery.maskedinput.min.js' %}"></script>
+    <script src="{% static 'lib/jgrowl/jquery.jgrowl.min.js' %}"></script>
+    <script src="{% static 'lib/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+{% block jslibs %}
+{% endblock %}
+</body>
+</html>
